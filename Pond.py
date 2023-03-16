@@ -1,5 +1,12 @@
 from PondData import PondData
+from Fish import Fish
 from random import randint
+import sys
+import pygame
+from PyQt5.QtWidgets import (QWidget, QSlider, QLineEdit, QLabel, QPushButton, QScrollArea,QApplication,
+                             QHBoxLayout, QVBoxLayout, QMainWindow)
+from PyQt5.QtCore import Qt, QSize
+from PyQt5 import QtWidgets, uic, QtGui
 
 class Pond:
     def __init__(self):
@@ -44,3 +51,23 @@ class Pond:
                 self.addFish(newFish)
                 self.pondData.addFish(newFish.fishData)
                 fish.resetPheromone()
+
+    def run(self):
+        pygame.init()
+        screen = pygame.display.set_mode((1280, 720))
+
+        bg = pygame.image.load("./assets/images/background/bg.jpg")
+        bg = pygame.transform.scale(bg, (1280, 720))
+        pygame.display.set_caption("Fish Haven Project")
+
+        app = QApplication(sys.argv)
+        other_pond_list = []
+
+        running = True
+        while running:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+            screen.blit(bg, [0,0])
+            pygame.display.flip()
+        pygame.quit()
