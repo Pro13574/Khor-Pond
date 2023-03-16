@@ -5,13 +5,17 @@ import time
 
 
 class Fish:
-    def __init__(self):
+    def __init__(self, pos_x, pos_y):
         self.id = self.randId()
         self.genesis = "genesis"
         # self.threshold = 10
         self.lifetime = 60
         self.status = "alive"
         self.staytime = 15
+        self.sprites = []
+        self.leftSprite = []
+        self.rightSprite = []
+        
 
     def setStaytime(self, time):
         self.staytime = time
