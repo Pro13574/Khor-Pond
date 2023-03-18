@@ -5,20 +5,17 @@ import time
 
 import pygame
 
+from FishData import FishData
+
+SPRITEPATH = "./assets/images/sprites/"
 
 class Fish(pygame.sprite.Sprite):
     def __init__(self, pos_x, pos_y, genesis="khor-pond", parent=None):
         super().__init__()
-        self.id = self.randId()
         self.fishData = FishData(genesis, parent)
-        
-        # self.threshold = 10
-        self.lifetime = 60
-        self.status = "alive"
-        self.staytime = 15
 
         self.direction = "RIGHT"
-        self.face = 1
+        self.flip = 1
         self.sprites = []
         self.leftSprite = []
         self.rightSprite = []
@@ -37,20 +34,32 @@ class Fish(pygame.sprite.Sprite):
 
     def getFishData(self):
         return self.fishData
-        
+
+    def getFishPosTL(self):
+        return self.rect.topleft
+
+    def getFishPosX(self):
+        return self.rect.left
+
+    def getFishPosY(self):
+        return self.rect.top
+
+    def die(self):
+        self.kill()
+
+    def flipSprite(self):
+        if self.flip == 1:
+            self.sprites = self.rightSprite
+        elif self.face == -1:
+            self.sprites = self.leftSprite
+
+        self.currentSprite = 0
+
     def setStaytime(self, time):
         self.staytime = time
 
     def getStaytime(self):
         return str(self.staytime)
-
-    def randId(self):
-        digits = [i for i in range(0, 10)]
-        random_str= ""
-        for i in range(6):
-            index = math.floor(random.random() * 10)
-            random_str += str(digits[index])
-        return random_str
 
     def beImmortal(self):
         countdown(self.lifetime)
