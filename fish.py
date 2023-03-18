@@ -10,7 +10,8 @@ class Fish(pygame.sprite.Sprite):
     def __init__(self, pos_x, pos_y, genesis="khor-pond", parent=None):
         super().__init__()
         self.id = self.randId()
-
+        self.fishData = FishData(genesis, parent)
+        
         # self.threshold = 10
         self.lifetime = 60
         self.status = "alive"
@@ -34,6 +35,9 @@ class Fish(pygame.sprite.Sprite):
         self.survivalTime = 0
         self.gaveBirth = False
 
+    def getFishData(self):
+        return self.fishData
+        
     def setStaytime(self, time):
         self.staytime = time
 
