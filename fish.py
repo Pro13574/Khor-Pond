@@ -3,19 +3,36 @@ import math
 import random
 import time
 
+import pygame
 
-class Fish:
-    def __init__(self, pos_x, pos_y):
+
+class Fish(pygame.sprite.Sprite):
+    def __init__(self, pos_x, pos_y, genesis="khor-pond", parent=None):
+        super().__init__()
         self.id = self.randId()
-        self.genesis = "genesis"
+
         # self.threshold = 10
         self.lifetime = 60
         self.status = "alive"
         self.staytime = 15
+
+        self.direction = "RIGHT"
+        self.face = 1
         self.sprites = []
         self.leftSprite = []
         self.rightSprite = []
+        self.loadSprite(genesis)
         
+        self.image = self.sprites[self.currentSprite]
+        self.rect = self.image.get_rect()
+        self.rect.topleft = [pos_x, pos_y]
+        self.rect.left = pos_x
+        self.rect.top = pos_y
+        self.rect.right = pos_x + 100
+        self.currentSprite = 0
+        self.rect = self.image.get_rect()
+        self.survivalTime = 0
+        self.gaveBirth = False
 
     def setStaytime(self, time):
         self.staytime = time
