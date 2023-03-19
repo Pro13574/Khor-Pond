@@ -110,7 +110,7 @@ class Fish(pygame.sprite.Sprite):
 
     def beImmortal(self):
         countdown(self.lifetime)
-        self.status = "immortal"
+        self.fishData.setStatus("immortal")
         print(self.getInfo())
 
     def hatching(self):
@@ -123,14 +123,11 @@ class Fish(pygame.sprite.Sprite):
         print("migrate")
 
     def migrate(self):
-        if self.staytime == 0:
+        if self.fishData.getStaytime() == 0:
             print()
 
     def crowding(self):
         pass
-
-    def getId(self):
-        return self.id
 
     def getInfo(self):
         return "Fish:" + self.fishData.getId() + "\n" + "Genesis name: " + self.genesis + "\nStatus: " + self.fishData.status
