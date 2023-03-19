@@ -1,9 +1,10 @@
 import random
 import math
 
+
 def randId(self):
     digits = [i for i in range(0, 10)]
-    random_str= ""
+    random_str = ""
     for i in range(6):
         index = math.floor(random.random() * 10)
         random_str += str(digits[index])
@@ -13,8 +14,10 @@ def randId(self):
 def randCrowdTs():
     return random.randint(5, 20)
 
+
 def randPheroTs():
     return random.randint(30, 60)
+
 
 class FishData:
     def __init__(self, genesis, parentId=None):
@@ -26,6 +29,7 @@ class FishData:
         self.pheromone = 0
         self.pheromoneTs = randPheroTs()
         self.lifetime = 60
+        self.staytime = 15
         self.parentId = parentId
 
     def getId(self):
@@ -40,21 +44,24 @@ class FishData:
     def getGenesis(self):
         return self.genesis
 
-    def getcrowdThreshold(self):
+    def getCrowdThreshold(self):
         return self.crowdThreshold
 
-    def pheromone(self):
+    def getPheromone(self):
         return self.pheromone
 
-    def pheromoneThresh(self):
+    def getPheromoneThresh(self):
         return self.pheromoneThresh
 
-    def lifetime(self):
+    def getLifetime(self):
         return self.lifetime
+
+    def getStaytime(self):
+        return self.staytime
 
     def parentId(self):
         return self.parentId
-    
+
     def __str__(self):
         if self.parentId:
             return self.id + "Genesis:" + self.genesis + " Parent:" + self.parentId + " Lifetime: " + str(self.lifetime)
