@@ -46,9 +46,10 @@ class Pond:
         self.removeFish(migrateFish)
         # self.network.migrate_fish(migrateFish.fishData, destination)
 
-    def addFish(self, newFishData):
-        self.fishes.append(newFishData)
-        # self.pondData.addFish(newFishData.fishData) fishData -> depends on our variable name
+    def addFish(self, newFish):
+        self.fishes.append(newFish)
+        self.pondData.addFish(newFish.fishData)
+        self.movingSprites.add(newFish)
         # self.network.pond = self.pondData
 
     def removeFish(self, fish):
@@ -57,17 +58,8 @@ class Pond:
             if fish.id == fish.getId():
                 self.pondData.fishes.remove(fish)
                 break
+        # self.movingSprites.remove(fish)
         # self.network.pond = self.pondData
-
-    def pheromoneCloud(self):
-        pheromone = randint(2, 20)
-        for fish in self.fishes:
-            fish.increasePheromone(pheromone)
-            if fish.isPregnant():
-                newFish = Fish()
-                self.addFish(newFish)
-                self.pondData.addFish(newFish.fishData)
-                fish.resetPheromone()
 
     def run(self):
         pygame.init()
