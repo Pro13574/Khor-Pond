@@ -9,29 +9,37 @@ from FishData import FishData
 
 SPRITEPATH = "./assets/images/sprites/"
 
-
 class Fish(pygame.sprite.Sprite):
-    def __init__(self, pos_x, pos_y, genesis="khor-pond", parent=None):
+    def __init__(self, genesis="khor-pond", parent=None):
         super().__init__()
         self.fishData = FishData(genesis, parent)
+        self.direction = random.choice(["left", "right"])
+        self.frame = 0
+        self.sprites: dict[str, list[pygame.Surface]] = {
+        "left": [],
+        "right": []
+        }
+        # self.flip = 1
+        # self.sprites = []
+        # self.leftSprite = []
+        # self.rightSprite = []
 
-        self.direction = "RIGHT"
-        self.flip = 1
-        self.sprites = []
-        self.leftSprite = []
-        self.rightSprite = []
-        self.loadSprite(genesis)
-
-        self.image = self.sprites[self.currentSprite]
-        self.rect = self.image.get_rect()
-        self.rect.topleft = [pos_x, pos_y]
-        self.rect.left = pos_x
-        self.rect.top = pos_y
-        self.rect.right = pos_x + 100
         self.currentSprite = 0
+        self.loadSprite(genesis)
+        #self.image = self.sprites[self.direction]
+        #self.rect.topleft = [pos_x, pos_y]
+        #self.rect.left = pos_x
+        #self.rect.top = pos_y
+        #self.rect.right = pos_x + 100
+        #self.rect = self.image.get_rect()
+        self.image = self.sprites[self.direction][self.frame]
         self.rect = self.image.get_rect()
         self.survivalTime = 0
         self.gaveBirth = False
+        
+        self.rect.x = random.randint(0, 1280 - self.rect.width)
+        self.rect.y = random.randint(0, 720 - self.rect.height)
+
 
     def getFishData(self):
         return self.fishData
@@ -48,62 +56,92 @@ class Fish(pygame.sprite.Sprite):
     def die(self):
         self.kill()
 
-    def flipSprite(self):
-        if self.flip == 1:
-            self.sprites = self.rightSprite
-        elif self.face == -1:
-            self.sprites = self.leftSprite
+    # def flipSprite(self):
+    #     if self.flip == 1:
+    #         self.sprites = self.rightSprite
+    #     elif self.flip == -1:
+    #         self.sprites = self.leftSprite
 
-        self.currentSprite = 0
+    #     self.currentSprite = 0
 
-    def loadSprite(self, genesis):
-        path = SPRITEPATH + "local-pond/" if genesis == "khor-pond" else SPRITEPATH + "foreign-pond/"
+    # def loadSprite(self, genesis):
+    #     path = SPRITEPATH + "local-pond/" if genesis == "khor-pond" else SPRITEPATH + "foreign-pond/"
 
-        self.loadSpriteLeft(path)
-        self.loadSpriteRight(path, self.rightSprite)
+    #     self.loadSpriteLeft(path)
+    #     self.loadSpriteRight(path, self.rightSprite)
+    #     self.loadSpriteRight(path, self.sprites)
+    #     self.loadSpriteLeft(path)
+    #     self.loadSpriteRight(path, self.rightSprite)
 
-    def loadSpriteLeft(self, path):
+    # def loadSpriteLeft(self, path):
+    #     for i in range(1, 5):
+    #         spritePath = path + str(i) + ".png"
+    #         img = pygame.image.load(str(spritePath))
+    #         img = pygame.transform.scale(img, (100, 100))
+    #         self.leftSprite.append(img)
+    #     self.currentSprite = 0
+
+    # def loadSpriteRight(self, path, container):
+    #     for i in range(1, 5):
+    #         spritePath = path + str(i) + ".png"
+    #         img = pygame.image.load(str(spritePath))
+    #         img = pygame.transform.scale(img, (100, 100))
+    #         img = pygame.transform.flip(img, True, False)
+    #         #container.apped(img)
+    #     self.sprites = container.copy()
+    #     self.currentSprite = 0
+
+    def loadSprite(self, genesis: str):
+        path = "./assets/images/sprites/"
+        if genesis == "khor-pond":
+            path += "local-pond/"
+        else:
+            path += "foreign-pond/"
+
         for i in range(1, 5):
-            spritePath = path + str(i) + ".png"
-            img = pygame.image.load(str(spritePath))
-            img = pygame.transform.scale(img, (100, 100))
-            self.leftSprite.append(img)
-        self.currentSprite = 0
+            image_path = f"{path}/{i}.png"
+            image = pygame.image.load(image_path).convert_alpha()
+            image_left = pygame.transform.scale(image, (100, 100))
+            image_right = pygame.transform.flip(image_left, True, False)
+            self.sprites["left"].append(image_left)
+            self.sprites["right"].append(image_right)
 
-    def loadSpriteRight(self, path, container):
-        for i in range(1, 5):
-            spritePath = path + str(i) + ".png"
-            img = pygame.image.load(str(spritePath))
-            img = pygame.transform.scale(img, (100, 100))
-            img = pygame.transform.flip(img, True, False)
-            container.apped(img)
-        self.sprites = container.copy()
-        self.currentSprite = 0
+        self.frame = 0    
 
-    def update(self, speed):
+    def update(self, speed = 1):
         # if self.attack_animation == True:
-        self.currentSprite += speed
-        if int(self.currentSprite) >= len(self.sprites):
-            self.currentSprite = 0
-        self.image = self.sprites[int(self.current_sprite)]
+        # self.currentSprite += speed
+        # if int(self.currentSprite) >= len(self.sprites):
+        #     self.currentSprite = 0
+        #self.image = self.sprites[int(self.current_sprite)]
+        self.frame = (self.frame + 0.1) % len(self.sprites[self.direction])
+        self.image = self.sprites[self.direction][int(self.frame)]
+        if self.direction == "left":
+            self.rect.x -= speed
+            if self.rect.x <= 0:
+                self.direction = "right"
+        else:
+            self.rect.x += speed
+            if self.rect.x >= 1280 - self.rect.width:
+                self.direction = "left"
+                                              
+    # def move(self, speed_x):
+    #     if self.rect.left <= 0:
+    #         print("bump left wall")
+    #         self.flip = 1
+    #         print("x axis" + str(self.rect.left) + str(self.flip))
+    #         self.flipSprite()
 
-    def move(self, speed_x):
-        if self.rect.left <= 0:
-            print("bump left wall")
-            self.flip = 1
-            print("x axis" + str(self.rect.left) + str(self.flip))
-            self.flipSprite()
+    #     elif self.rect.left >= 1180:
+    #         print("bump right wall")
+    #         self.flip = -1
+    #         print("x axis" + str(self.rect.left) + str(self.flip))
+    #         self.flipSprite()
 
-        elif self.rect.left >= 1180:
-            print("bump right wall")
-            self.flip = -1
-            print("x axis" + str(self.rect.left) + str(self.flip))
-            self.flipSprite()
+    #     speed_x = random.randint(1, 5) * self.flip
 
-        speed_x = random.randint(1, 5) * self.flip
-
-        self.rect.x += speed_x
-        self.update(0.05)
+    #     self.rect.x += speed_x
+    #     self.update(0.05)
 
     def increasePheromone(self, n):
         self.fishData.pheromone += n
@@ -175,3 +213,6 @@ if __name__ == "__main__":
     print(fish.getInfo())
     fish.hatching()
     fish.beImmortal()
+
+
+

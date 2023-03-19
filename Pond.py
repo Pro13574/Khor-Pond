@@ -1,5 +1,5 @@
 from PondData import PondData
-from Fish import Fish
+from fish import Fish
 from random import randint
 import sys
 import pygame
@@ -25,7 +25,7 @@ class Pond:
         return len(self.fishes)
 
     def spawnFish(self, parentFish=None):
-        fishes = Fish(100, 100, self.name, parentFish.getId())
+        fishes = Fish(self.name, parentFish.getId())
         self.fishes.append(fishes)
         self.movingSprites.add(fishes)
 
@@ -72,11 +72,19 @@ class Pond:
         app = QApplication(sys.argv)
         other_pond_list = []
 
+        fish = Fish(genesis="khor-pond")
+        self.movingSprites.add(fish)
         running = True
         while running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
+            self.movingSprites.update()
             screen.blit(bg, [0, 0])
+            self.movingSprites.draw(screen)
             pygame.display.flip()
         pygame.quit()
+
+if __name__ == "__main__":
+    p = Pond()
+    p.run()

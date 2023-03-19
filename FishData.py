@@ -2,7 +2,7 @@ import random
 import math
 
 
-def randId(self):
+def randId():
     digits = [i for i in range(0, 10)]
     random_str = ""
     for i in range(6):
