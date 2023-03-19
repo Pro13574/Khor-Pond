@@ -3,36 +3,53 @@ from Fish import Fish
 from random import randint
 import sys
 import pygame
-from PyQt5.QtWidgets import (QWidget, QSlider, QLineEdit, QLabel, QPushButton, QScrollArea,QApplication,
+from PyQt5.QtWidgets import (QWidget, QSlider, QLineEdit, QLabel, QPushButton, QScrollArea, QApplication,
                              QHBoxLayout, QVBoxLayout, QMainWindow)
 from PyQt5.QtCore import Qt, QSize
 from PyQt5 import QtWidgets, uic, QtGui
+
 
 class Pond:
     def __init__(self):
         self.name = "khor-pond"
         self.fishes = []
+        self.movingSprites = pygame.sprite.Group()
         self.pondData = PondData(self.name)
         self.msg = ""
         self.network = None
-    
+
+    def getPondData(self):
+        return self.pondData
+
     def getPopulation(self):
         return len(self.fishes)
 
-    def spawnFish(self, parentFish = None):
-        #declare tempFish here
-        #self.fishes.append(tempFish)
-        return 
-    
-    def migrateFish(self, fishIndex, destination):
+    def spawnFish(self, parentFish=None):
+        fishes = Fish(100, 100, self.name, parentFish.getId())
+        self.fishes.append(fishes)
+        self.movingSprites.add(fishes)
+
+    def pheromoneCloud(self):
+        pheromone = randint(2, 20)
+        for fish in self.fishes:
+            fish.increasePheromone(pheromone)
+
+            if fish.isPregnant():
+                newFish = fish.hatch()
+                print("A fry has born")
+                self.addFish(newFish)
+                fish.resetPheromone()
+
+    def migrateFish(self, fishIndex):
+        # def migrateFish(self, fishIndex, destination):
         migrateFish = self.fishes[fishIndex]
         self.removeFish(migrateFish)
-        #self.network.migrate_fish(migrateFish.fishData, destination)
+        # self.network.migrate_fish(migrateFish.fishData, destination)
 
     def addFish(self, newFishData):
         self.fishes.append(newFishData)
-        #self.pondData.addFish(newFishData.fishData) fishData -> depends on our variable name
-        #self.network.pond = self.pondData
+        # self.pondData.addFish(newFishData.fishData) fishData -> depends on our variable name
+        # self.network.pond = self.pondData
 
     def removeFish(self, fish):
         self.fishes.remove(fish)
@@ -40,7 +57,7 @@ class Pond:
             if fish.id == fish.getId():
                 self.pondData.fishes.remove(fish)
                 break
-        #self.network.pond = self.pondData
+        # self.network.pond = self.pondData
 
     def pheromoneCloud(self):
         pheromone = randint(2, 20)
@@ -68,6 +85,6 @@ class Pond:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
-            screen.blit(bg, [0,0])
+            screen.blit(bg, [0, 0])
             pygame.display.flip()
         pygame.quit()
