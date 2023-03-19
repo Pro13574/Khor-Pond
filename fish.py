@@ -87,8 +87,23 @@ class Fish(pygame.sprite.Sprite):
             self.currentSprite = 0
         self.image = self.sprites[int(self.current_sprite)]
 
-    def getStaytime(self):
-        return str(self.staytime)
+    def move(self, speed_x):
+        if self.rect.left <= 0:
+            print("bump left wall")
+            self.flip = 1
+            print("x axis" + str(self.rect.left) + str(self.flip))
+            self.flipSprite()
+
+        elif self.rect.left >= 1180:
+            print("bump right wall")
+            self.flip = -1
+            print("x axis" + str(self.rect.left) + str(self.flip))
+            self.flipSprite()
+
+        speed_x = random.randint(1, 5) * self.flip
+
+        self.rect.x += speed_x
+        self.update(0.05)
 
     def beImmortal(self):
         countdown(self.lifetime)
@@ -115,7 +130,7 @@ class Fish(pygame.sprite.Sprite):
         return self.id
 
     def getInfo(self):
-        return "Fish:" + self.getId() + "\n" + "Genesis name: " + self.genesis + "\nStatus: " + self.status
+        return "Fish:" + self.fishData.getId() + "\n" + "Genesis name: " + self.genesis + "\nStatus: " + self.fishData.status
 
 
 def countdown(sec):
