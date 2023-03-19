@@ -55,6 +55,30 @@ class Fish(pygame.sprite.Sprite):
 
         self.currentSprite = 0
 
+    def loadSprite(self, genesis):
+        path = SPRITEPATH + "local-pond/" if genesis == "khor-pond" else SPRITEPATH + "foreign-pond/"
+
+        self.loadSpriteLeft(path)
+        self.loadSpriteRight(path, self.rightSprite)
+
+    def loadSpriteLeft(self, path):
+        for i in range(1, 5):
+            spritePath = path + str(i) + ".png"
+            img = pygame.image.load(str(spritePath))
+            img = pygame.transform.scale(img, (100, 100))
+            self.leftSprite.append(img)
+        self.currentSprite = 0
+
+    def loadSpriteRight(self, path, container):
+        for i in range(1, 5):
+            spritePath = path + str(i) + ".png"
+            img = pygame.image.load(str(spritePath))
+            img = pygame.transform.scale(img, (100, 100))
+            img = pygame.transform.flip(img, True, False)
+            container.apped(img)
+        self.sprites = container.copy()
+        self.currentSprite = 0
+
     def setStaytime(self, time):
         self.staytime = time
 
