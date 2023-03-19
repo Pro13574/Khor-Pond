@@ -45,13 +45,13 @@ class FishData:
         return self.genesis
 
     def getCrowdThreshold(self):
-        return self.crowdThreshold
+        return self.crowdTs
 
     def getPheromone(self):
         return self.pheromone
 
     def getPheromoneThresh(self):
-        return self.pheromoneThresh
+        return self.pheromoneTs
 
     def getLifetime(self):
         return self.lifetime
