@@ -59,8 +59,11 @@ class FishData:
     def getStaytime(self):
         return self.staytime
 
-    def parentId(self):
+    def getParentId(self):
         return self.parentId
+
+    def setStatus(self, status):
+        self.status = status
 
     def __str__(self):
         if self.parentId:
