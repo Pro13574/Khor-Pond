@@ -105,6 +105,9 @@ class Fish(pygame.sprite.Sprite):
         self.rect.x += speed_x
         self.update(0.05)
 
+    def increasePheromone(self, n):
+        self.fishData.pheromone += n
+
     def beImmortal(self):
         countdown(self.lifetime)
         self.status = "immortal"
