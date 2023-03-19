@@ -113,14 +113,16 @@ class Fish(pygame.sprite.Sprite):
         self.fishData.setStatus("immortal")
         print(self.getInfo())
 
-    def hatching(self):
-        fry = Fish()
-        randTime = random.randint(1, 15)
-        self.setStaytime(randTime)
-        fry.setStaytime(randTime)
-        print(fry.getInfo())
-        countdown(randTime)
-        print("migrate")
+    def hatch(self):
+        fry = Fish(50, random.randint(50, 650),
+                   self.fishData.getGenesis(), self.fishData.getId())
+        # randTime = random.randint(1, 15)
+        # self.fishData.setStaytime(randTime)
+        # fry.fishData.setStaytime(randTime)
+        # print(fry.getInfo())
+        # countdown(randTime)
+        # print("migrate")
+        return fry
 
     def migrate(self):
         if self.fishData.getStaytime() == 0:
