@@ -124,13 +124,37 @@ class Fish(pygame.sprite.Sprite):
 
     def migrate(self):
         if self.fishData.getStaytime() == 0:
-            print()
+            print("The fish should migrate to another pond")
 
     def crowding(self):
         pass
 
+    def getId(self):
+        return self.fishData.getId()
+
     def getInfo(self):
         return "Fish:" + self.fishData.getId() + "\n" + "Genesis name: " + self.genesis + "\nStatus: " + self.fishData.status
+
+    def isPregnant(self):
+        return self.fishData.pheromone >= self.fishData.pheromoneTs
+
+    def updateLifeTime(self):
+        # self.in_pond_sec += 1
+        self.fishData.lifetime -= 1
+        if self.fishData.lifetime == 0:
+            self.fishData.status = "dead"
+
+    def resetPheromone(self):
+        self.fishData.pheromone = 0
+
+    def getGenesis(self):
+        return self.fishData.getGenesis()
+
+    def getCrowdThresh(self):
+        return self.fishData.getCrowdThreshold()
+
+    def giveBirth(self):
+        self.gaveBirth = True
 
 
 def countdown(sec):
