@@ -9,6 +9,7 @@ from FishData import FishData
 
 SPRITEPATH = "./assets/images/sprites/"
 
+
 class Fish(pygame.sprite.Sprite):
     def __init__(self, pos_x, pos_y, genesis="khor-pond", parent=None):
         super().__init__()
@@ -20,7 +21,7 @@ class Fish(pygame.sprite.Sprite):
         self.leftSprite = []
         self.rightSprite = []
         self.loadSprite(genesis)
-        
+
         self.image = self.sprites[self.currentSprite]
         self.rect = self.image.get_rect()
         self.rect.topleft = [pos_x, pos_y]
@@ -79,8 +80,12 @@ class Fish(pygame.sprite.Sprite):
         self.sprites = container.copy()
         self.currentSprite = 0
 
-    def setStaytime(self, time):
-        self.staytime = time
+    def update(self, speed):
+        # if self.attack_animation == True:
+        self.currentSprite += speed
+        if int(self.currentSprite) >= len(self.sprites):
+            self.currentSprite = 0
+        self.image = self.sprites[int(self.current_sprite)]
 
     def getStaytime(self):
         return str(self.staytime)
@@ -111,21 +116,21 @@ class Fish(pygame.sprite.Sprite):
 
     def getInfo(self):
         return "Fish:" + self.getId() + "\n" + "Genesis name: " + self.genesis + "\nStatus: " + self.status
-        
+
 
 def countdown(sec):
- 
+
     while sec > 0:
-        timer = datetime.timedelta(seconds = sec)
+        timer = datetime.timedelta(seconds=sec)
         print(timer, end="\r")
         time.sleep(1)
         sec -= 1
- 
+
     return True
+
 
 if __name__ == "__main__":
     fish = Fish()
     print(fish.getInfo())
     fish.hatching()
     fish.beImmortal()
-    
