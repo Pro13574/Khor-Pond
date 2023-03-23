@@ -1,6 +1,10 @@
+import threading
 from PondData import PondData
 from fish import Fish
+import random
 from random import randint
+from Client import Client
+
 import sys
 import pygame
 from PyQt5.QtWidgets import (QWidget, QSlider, QLineEdit, QLabel, QPushButton, QScrollArea, QApplication,
@@ -24,15 +28,11 @@ class Pond:
     def getPopulation(self):
         return len(self.fishes)
 
-    def spawnFish(self, parentFish=None):
-        fishes = Fish(self.name, parentFish.getId())
-        self.fishes.append(fishes)
-        self.movingSprites.add(fishes)
-
     def pheromoneCloud(self):
         pheromone = randint(2, 20)
         for fish in self.fishes:
             fish.increasePheromone(pheromone)
+            print("inrease phero")
 
             if fish.isPregnant():
                 newFish = fish.hatch()
@@ -56,7 +56,7 @@ class Pond:
         self.fishes.remove(fish)
         for f in self.pondData.fishes:
             if f.id == fish.getId():
-                self.pondData.fishes.remove(fish)
+                self.pondData.fishes.remove(f)
                 break
         # self.movingSprites.remove(fish)
         # self.network.pond = self.pondData
@@ -77,7 +77,7 @@ class Pond:
                     if random.getrandbits(1):
                         destination = random.choice(
                             list(self.network.other_pondsd.keys()))
-                        self.migrateFish(indedx, destination)
+                        self.migrateFish(index, destination)
                         parent = None
                         if (fish.fishData.parentId):
                             parent = fish.fishData.parentId
@@ -97,6 +97,14 @@ class Pond:
             self.network.pond = self.pondData
 
     def run(self):
+        self.network = Client(self.pondData)
+        # msg_handler = threading.Thread(target=self.network.get_msg)
+        # msg_han6dler.start()
+        # send_handler = threading.Thread(target=self.network.send_pond)
+        # send_handler.start()
+        # lifetime_handler = threading.Thread(
+        #     target=self.network.handle_lifetime)
+        # lifetime_handler.start()
         pygame.init()
         screen = pygame.display.set_mode((1280, 720))
 
@@ -105,19 +113,55 @@ class Pond:
         pygame.display.set_caption("Fish Haven Project")
 
         app = QApplication(sys.argv)
+        clock = pygame.time.Clock()
+        pregnant_time = pygame.time.get_ticks()
+        update_time = pygame.time.get_ticks()
         other_pond_list = []
 
-        fish = Fish(genesis="khor-pond")
-        self.movingSprites.add(fish)
+        self.addFish(Fish())
         running = True
         while running:
+            if len(self.fishes) > 15:
+                while (len(self.fishes) > 16):
+                    kill = randint(0, len(self.fishes) - 1)
+                    self.removeFish(self.fishes[kill])
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
             self.movingSprites.update()
             screen.blit(bg, [0, 0])
             self.movingSprites.draw(screen)
+
+            other_pond_list = []
+            # if len(self.network.messageQ) > 0:
+            #     self.msg = self.network.messageQ.pop()
+            #     if (self.msg.action == "MIGRATE"):
+            #         newFish = Fish(50, randint(
+            #             50, 650), self.msg.data['fish'].genesis, self.msg.data['fish'].parentId)
+            #         print("ADD MIGRATED FISH")
+            #         self.addFish(newFish)
+
+            screen.fill((0, 0, 0))
+            screen.blit(bg, [0, 0])
+
+            for fish in self.movingSprites:
+                screen.blit(fish.image, fish.rect)
+
+            time_since_new_birth = pygame.time.get_ticks() - pregnant_time
+            time_since_update = pygame.time.get_ticks() - update_time
+
+            if time_since_update > 1000:
+                self.update()
+                update_time = pygame.time.get_ticks()
+
+            if (time_since_new_birth > 5000):
+                print("phero cloud deploy")
+                self.pheromoneCloud()
+                pregnant_time = pygame.time.get_ticks()
+
             pygame.display.flip()
+
         pygame.quit()
 
 
