@@ -1,6 +1,7 @@
 import threading
 from PondData import PondData
-from fish import Fish
+from Fish import Fish
+from FishStore import FishStore
 import random
 from random import randint
 from Client import Client

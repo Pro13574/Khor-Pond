@@ -1,0 +1,5 @@
+<RCC>
+  <qresource prefix="fish">
+    <file>../sprites/local-pond/5.png</file>
+  </qresource>
+</RCC>

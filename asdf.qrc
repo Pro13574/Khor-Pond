@@ -1,0 +1,6 @@
+<RCC>
+  <qresource prefix="background">
+    <file>../sprites/local-pond/5.png</file>
+    <file>bg.jpg</file>
+  </qresource>
+</RCC>
