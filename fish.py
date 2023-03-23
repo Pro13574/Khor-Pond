@@ -9,6 +9,7 @@ from FishData import FishData
 
 SPRITEPATH = "./assets/images/sprites/"
 
+
 class Fish(pygame.sprite.Sprite):
     def __init__(self, genesis="khor-pond", parent=None):
         super().__init__()
@@ -16,8 +17,8 @@ class Fish(pygame.sprite.Sprite):
         self.direction = random.choice(["left", "right"])
         self.frame = 0
         self.sprites: dict[str, list[pygame.Surface]] = {
-        "left": [],
-        "right": []
+            "left": [],
+            "right": []
         }
         # self.flip = 1
         # self.sprites = []
@@ -26,20 +27,19 @@ class Fish(pygame.sprite.Sprite):
 
         self.currentSprite = 0
         self.loadSprite(genesis)
-        #self.image = self.sprites[self.direction]
-        #self.rect.topleft = [pos_x, pos_y]
-        #self.rect.left = pos_x
-        #self.rect.top = pos_y
-        #self.rect.right = pos_x + 100
-        #self.rect = self.image.get_rect()
+        # self.image = self.sprites[self.direction]
+        # self.rect.topleft = [pos_x, pos_y]
+        # self.rect.left = pos_x
+        # self.rect.top = pos_y
+        # self.rect.right = pos_x + 100
+        # self.rect = self.image.get_rect()
         self.image = self.sprites[self.direction][self.frame]
         self.rect = self.image.get_rect()
         self.survivalTime = 0
         self.gaveBirth = False
-        
+
         self.rect.x = random.randint(0, 1280 - self.rect.width)
         self.rect.y = random.randint(0, 720 - self.rect.height)
-
 
     def getFishData(self):
         return self.fishData
@@ -106,14 +106,14 @@ class Fish(pygame.sprite.Sprite):
             self.sprites["left"].append(image_left)
             self.sprites["right"].append(image_right)
 
-        self.frame = 0    
+        self.frame = 0
 
-    def update(self, speed = 1):
+    def update(self, speed=1):
         # if self.attack_animation == True:
         # self.currentSprite += speed
         # if int(self.currentSprite) >= len(self.sprites):
         #     self.currentSprite = 0
-        #self.image = self.sprites[int(self.current_sprite)]
+        # self.image = self.sprites[int(self.current_sprite)]
         self.frame = (self.frame + 0.1) % len(self.sprites[self.direction])
         self.image = self.sprites[self.direction][int(self.frame)]
         if self.direction == "left":
@@ -124,7 +124,7 @@ class Fish(pygame.sprite.Sprite):
             self.rect.x += speed
             if self.rect.x >= 1280 - self.rect.width:
                 self.direction = "left"
-                                              
+
     # def move(self, speed_x):
     #     if self.rect.left <= 0:
     #         print("bump left wall")
@@ -152,8 +152,8 @@ class Fish(pygame.sprite.Sprite):
         print(self.getInfo())
 
     def hatch(self):
-        fry = Fish(50, random.randint(50, 650),
-                   self.fishData.getGenesis(), self.fishData.getId())
+        fry = Fish(self.fishData.getGenesis(), self.fishData.getId())
+
         # randTime = random.randint(1, 15)
         # self.fishData.setStaytime(randTime)
         # fry.fishData.setStaytime(randTime)
@@ -213,6 +213,3 @@ if __name__ == "__main__":
     print(fish.getInfo())
     fish.hatching()
     fish.beImmortal()
-
-
-
