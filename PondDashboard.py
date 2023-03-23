@@ -9,8 +9,6 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtGui import QPixmap
-from PyQt5.QtWidgets import QMainWindow, QApplication, QLabel
 
 
 class Ui_MainWindow(object):
@@ -27,21 +25,16 @@ class Ui_MainWindow(object):
         self.textEdit.setObjectName("textEdit")
         self.label = QtWidgets.QLabel(self.centralwidget)
         self.label.setGeometry(QtCore.QRect(10, 10, 181, 151))
-        self.pixmap = QPixmap("5.png")
-#         self.label.setStyleSheet("Qlabel{\n"
-# "url(:/background/sprites/local-pond/5.png)\n"
-# "}")
+
         self.label.setText("")
-        self.label.setPixmap(QtGui.QPixmap("5.png"))
+        self.label.setPixmap(QtGui.QPixmap(":/fish/sprites/local-pond/5.png"))
         self.label.setScaledContents(True)
         self.label.setObjectName("label")
         self.label_2 = QtWidgets.QLabel(self.centralwidget)
         self.label_2.setGeometry(QtCore.QRect(220, 10, 181, 151))
-#         self.label_2.setStyleSheet("Qlabel{\n"
-# "url(:/background/sprites/local-pond/5.png)\n"
-# "}")
+
         self.label_2.setText("")
-        self.label_2.setPixmap(QtGui.QPixmap(":/background/sprites/local-pond/5.png"))
+        self.label_2.setPixmap(QtGui.QPixmap(":/fish/sprites/local-pond/5.png"))
         self.label_2.setScaledContents(True)
         self.label_2.setObjectName("label_2")
         self.textEdit_2 = QtWidgets.QTextEdit(self.centralwidget)
@@ -58,38 +51,30 @@ class Ui_MainWindow(object):
         self.textEdit_5.setObjectName("textEdit_5")
         self.label_3 = QtWidgets.QLabel(self.centralwidget)
         self.label_3.setGeometry(QtCore.QRect(450, 10, 181, 151))
-        self.label_3.setStyleSheet("Qlabel{\n"
-"url(:/background/sprites/local-pond/5.png)\n"
-"}")
+
         self.label_3.setText("")
-        self.label_3.setPixmap(QtGui.QPixmap(":/background/sprites/local-pond/5.png"))
+        self.label_3.setPixmap(QtGui.QPixmap(":/fish/sprites/local-pond/5.png"))
         self.label_3.setScaledContents(True)
         self.label_3.setObjectName("label_3")
         self.label_4 = QtWidgets.QLabel(self.centralwidget)
         self.label_4.setGeometry(QtCore.QRect(10, 250, 181, 151))
-        self.label_4.setStyleSheet("Qlabel{\n"
-"url(:/background/sprites/local-pond/5.png)\n"
-"}")
+
         self.label_4.setText("")
-        self.label_4.setPixmap(QtGui.QPixmap(":/background/sprites/local-pond/5.png"))
+        self.label_4.setPixmap(QtGui.QPixmap(":/fish/sprites/local-pond/5.png"))
         self.label_4.setScaledContents(True)
         self.label_4.setObjectName("label_4")
         self.label_5 = QtWidgets.QLabel(self.centralwidget)
         self.label_5.setGeometry(QtCore.QRect(220, 250, 181, 151))
-        self.label_5.setStyleSheet("Qlabel{\n"
-"url(:/background/sprites/local-pond/5.png)\n"
-"}")
+
         self.label_5.setText("")
-        self.label_5.setPixmap(QtGui.QPixmap(":/background/sprites/local-pond/5.png"))
+        self.label_5.setPixmap(QtGui.QPixmap(":/fish/sprites/local-pond/5.png"))
         self.label_5.setScaledContents(True)
         self.label_5.setObjectName("label_5")
         self.label_6 = QtWidgets.QLabel(self.centralwidget)
         self.label_6.setGeometry(QtCore.QRect(450, 250, 181, 151))
-        self.label_6.setStyleSheet("Qlabel{\n"
-"url(:/background/sprites/local-pond/5.png)\n"
-"}")
+
         self.label_6.setText("")
-        self.label_6.setPixmap(QtGui.QPixmap(":/background/sprites/local-pond/5.png"))
+        self.label_6.setPixmap(QtGui.QPixmap(":/fish/sprites/local-pond/5.png"))
         self.label_6.setScaledContents(True)
         self.label_6.setObjectName("label_6")
         self.textEdit_6 = QtWidgets.QTextEdit(self.centralwidget)
@@ -164,6 +149,31 @@ class Ui_MainWindow(object):
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Status:</p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Genesis:</p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Lifetime:</p></body></html>"))
+
+    def createFishFrame(self,fish_list):
+        #delete old frames
+        for i in reversed(range(self.grid.count())):
+            widget = self.grid.itemAt(i).widget()
+            self.grid.removeWidget(widget)
+            widget.setParent(None)
+
+        temp = 3
+        j = 0
+        for i in range(len(fish_list)):
+            fish_list[i].updateLifeTime()
+            info = [
+                fish_list[i].getFishData().getId(),
+                fish_list[i].getFishData().getState(),
+                fish_list[i].getFishData().getStatus(),
+                fish_list[i].getFishData().getGenesis(),
+                fish_list[i].getFishData().getLifeTimeLeft()
+            ]
+            self.grid.addWidget(FishFrame(info, self.widget), temp, j)
+            # temp +=1
+            j+=1
+            if j>3:
+                j = 0
+                temp+=1
 
 if __name__ == "__main__":
     import sys
