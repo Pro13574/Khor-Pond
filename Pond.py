@@ -58,7 +58,7 @@ class Pond:
             if f.id == fish.getId():
                 self.pondData.fishes.remove(f)
                 break
-        # self.movingSprites.remove(fish)
+        self.movingSprites.remove(fish)
         # self.network.pond = self.pondData
 
     def update(self, injectPheromone=False):
@@ -121,8 +121,10 @@ class Pond:
         self.addFish(Fish())
         running = True
         while running:
+            print("len fishes ", len(self.fishes))
             if len(self.fishes) > 15:
                 while (len(self.fishes) > 16):
+                    print("looping")
                     kill = randint(0, len(self.fishes) - 1)
                     self.removeFish(self.fishes[kill])
 
@@ -155,12 +157,13 @@ class Pond:
                 self.update()
                 update_time = pygame.time.get_ticks()
 
-            if (time_since_new_birth > 5000):
-                print("phero cloud deploy")
+            if (time_since_new_birth > 2000):
+                print("phero cloud inject")
                 self.pheromoneCloud()
                 pregnant_time = pygame.time.get_ticks()
 
             pygame.display.flip()
+            clock.tick(60)
 
         pygame.quit()
 
