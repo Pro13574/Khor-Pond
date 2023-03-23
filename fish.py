@@ -145,6 +145,7 @@ class Fish(pygame.sprite.Sprite):
 
     def increasePheromone(self, n):
         self.fishData.pheromone += n
+        print("phero now: ", self.fishData.pheromone)
 
     def beImmortal(self):
         countdown(self.lifetime)
