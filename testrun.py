@@ -1,12 +1,12 @@
 from Pond import Pond
-pond = Pond()
+
+from FishStore import FishStore, connect_to_redis
+
+r = connect_to_redis()
+fishStore = FishStore(r)
+
+pond = Pond("Khor-pond", fishStore)
 pond.run()
 
-# from FishStore import FishStore, connect_to_redis
-
-# redis
-# r = connect_to_redis()
-# fishStore = FishStore(r)
-
-# pond = Pond(fishStore=FishStore)
+# pond = Pond()
 # pond.run()

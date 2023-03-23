@@ -3,7 +3,7 @@ import time
 from dataclasses import dataclass
 from typing import Dict, List, Union
 
-#import redis
+import redis
 
 from Fish import Fish
 from FishData import FishData
@@ -24,33 +24,28 @@ class ExampleObject:
 log = get_logger("redis")
 
 
-# def connect_to_redis(
-#     host="localhost", port=6379, password=None, retries=3, retry_interval=1, db=0
-# ) -> Union[redis.StrictRedis, None]:
-#     for i in range(retries):
-#         try:
-#             r = redis.StrictRedis(host=host, port=port,
-#                                   password=password, db=db)
-#             if r.ping():
-#                 log.info(f"Connected to Redis at {host}:{port}")
-#                 return r
-#             else:
-#                 raise redis.ConnectionError()
-#         except redis.ConnectionError as e:
-#             if i < retries - 1:
-#                 log.warning(
-#                     f"Error connecting to Redis at {host}:{port} {e} Retrying in {retry_interval} seconds..."
-#                 )
-#                 time.sleep(retry_interval)
-#             else:
-#                 log.warning(
-#                     f"Error connecting to Redis at {host}:{port} after {retries} attempts. Giving up."
-#                 )
-#                 return None
-#         except redis.RedisError as e:
-#             log.exception(f"Error connecting to Redis at {host}:{port} {e}")
-#             return None
-# Fish transporter from/to redis
+def connect_to_redis(host="localhost", port=6379, password=None, retries=5, retry_interval=1, db=0) -> redis.StrictRedis | None:
+    for i in range(retries):
+        try:
+            r = redis.StrictRedis(host=host,
+                                  port=port,
+                                  password=password,
+                                  db=db)
+            if r.ping():
+                log.info(f"connected to Redis at {host}:{port}")
+                return r
+            else:
+                raise redis.ConnectionError()
+
+        except redis.ConnectionError:
+            if i < retries - 1:
+                log.warning(
+                    f"failed to connect to Redis at {host}:{port}, retrying in {retry_interval} second")
+                time.sleep(retry_interval)
+            else:
+                log.error(
+                    f"failed to connect to Redis at {host}:{port}, after {retries} attempts")
+                return None
 
 
 class FishStore:
@@ -74,5 +69,5 @@ class FishStore:
         fishes_data = [
             pickle.loads(data) for data in self.redis.mget(fish_ids) if data is not None
         ]
-        fishes = [Fish(fish.x, fish.y, data=fish) for fish in fishes_data]
+        fishes = [Fish(fish) for fish in fishes_data]
         return dict(zip(fish_ids, fishes))

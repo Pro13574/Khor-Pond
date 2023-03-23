@@ -15,8 +15,9 @@ from PyQt5 import QtWidgets, uic, QtGui
 
 
 class Pond:
-    def __init__(self):
-        self.name = "khor-pond"
+    def __init__(self, name: str, fishStore: FishStore):
+        self.name: str = name
+        self.fishStore: FishStore = fishStore
         self.fishes = []
         self.movingSprites = pygame.sprite.Group()
         self.pondData = PondData(self.name)
@@ -51,6 +52,7 @@ class Pond:
         self.fishes.append(newFish)
         self.pondData.addFish(newFish.fishData)
         self.movingSprites.add(newFish)
+        self.fishStore.add_fish(newFish.getFishData())
         # self.network.pond = self.pondData
 
     def removeFish(self, fish):
@@ -61,6 +63,10 @@ class Pond:
                 break
         self.movingSprites.remove(fish)
         # self.network.pond = self.pondData
+
+    def load_fishes(self):
+        for fish in self.fishStore.get_fishes().values():
+            self.movingSprites.add(fish)
 
     def update(self, injectPheromone=False):
         for index, fish in enumerate(self.fishes):
@@ -119,6 +125,7 @@ class Pond:
         update_time = pygame.time.get_ticks()
         other_pond_list = []
 
+        self.load_fishes()
         self.addFish(Fish())
         running = True
         while running:
