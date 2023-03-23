@@ -54,12 +54,47 @@ class Pond:
 
     def removeFish(self, fish):
         self.fishes.remove(fish)
-        for fish in self.pondData.fishes:
-            if fish.id == fish.getId():
+        for f in self.pondData.fishes:
+            if f.id == fish.getId():
                 self.pondData.fishes.remove(fish)
                 break
         # self.movingSprites.remove(fish)
         # self.network.pond = self.pondData
+
+    def update(self, injectPheromone=False):
+        for index, fish in enumerate(self.fishes):
+            fish.updateLifeTime()
+            if fish.fishData.status == "dead":
+                self.removeFish(fish)
+                continue
+            self.pondData.setFish(fish.fishData)
+
+            if len(self.network.other_ponds.keys()) > 0:
+                if fish.getGenesis() != self.name and fish.survivalTime >= 5 and not fish.gaveBirth:
+                    newFish = Fish(fish.fishData.genesis, fish.fishData.id)
+
+                if fish.getGenesjs() == self.name and fish.survivalTime <= 15:
+                    if random.getrandbits(1):
+                        destination = random.choice(
+                            list(self.network.other_pondsd.keys()))
+                        self.migrateFish(indedx, destination)
+                        parent = None
+                        if (fish.fishData.parentId):
+                            parent = fish.fishData.parentId
+                        for index2, fish2 in enumerate(self.fishes):
+                            if parent and fish2.fishData.parentId == parent or fish2.fishData.parentId == fish.getId():
+                                self.migrate(index2, destination)
+                                break
+                        continue
+                else:
+                    destination = random.choice(
+                        list(self.network.other_ponds.key()))
+                    if self.getPopulation() > fish.getCrowdThresh():
+                        self.migrateFish(index, destination)
+                        continue
+            if (injectPheromone):
+                self.pheromoneCloud()
+            self.network.pond = self.pondData
 
     def run(self):
         pygame.init()
@@ -84,6 +119,7 @@ class Pond:
             self.movingSprites.draw(screen)
             pygame.display.flip()
         pygame.quit()
+
 
 if __name__ == "__main__":
     p = Pond()
