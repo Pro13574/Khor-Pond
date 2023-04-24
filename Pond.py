@@ -1,4 +1,5 @@
 import threading
+from Dashboard import Dashboard
 from PondData import PondData
 from Fish import Fish
 from FishStore import FishStore
@@ -139,6 +140,15 @@ class Pond:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_RIGHT:
+                        # print(self.fishes[0].getId())
+                        allPondsNum = len(self.fishes)
+                        for p in self.network.other_ponds.values():
+                            allPondsNum += p.getPopulation()
+                        db = Dashboard(self.fishes, allPondsNum)
+                        # pond_handler = threading.Thread(target=app.exec_)
+                        # pond_handler.start()
             self.movingSprites.update()
             screen.blit(bg, [0, 0])
             self.movingSprites.draw(screen)
@@ -176,6 +186,6 @@ class Pond:
         pygame.quit()
 
 
-if __name__ == "__main__":
-    p = Pond()
-    p.run()
+# if __name__ == "__main__":
+#     p = Pond()
+#     p.run()
