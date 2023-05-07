@@ -146,9 +146,9 @@ class Pond:
                         allPondsNum = len(self.fishes)
                         for p in self.network.other_ponds.values():
                             allPondsNum += p.getPopulation()
-                        db = Dashboard(self.fishes, allPondsNum)
-                        # pond_handler = threading.Thread(target=app.exec_)
-                        # pond_handler.start()
+                        db = Dashboard(self, allPondsNum)
+            # pond_handler = threading.Thread(target=app.exec_)
+            # pond_handler.start()
             self.movingSprites.update()
             screen.blit(bg, [0, 0])
             self.movingSprites.draw(screen)
