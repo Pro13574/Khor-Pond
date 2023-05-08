@@ -15,10 +15,10 @@ class Dashboard(QMainWindow):
     def __init__(self, myPond: str = None, allPondsNum: int = None):
         super().__init__()
         self.myPond = myPond
-        self.fished = myPond.fishes
+        self.fishes = myPond.fishes
         self.allPondsNum = allPondsNum
         self.allPondsFishes = 0
-        # print(self.fished[0].getId())
+        # print(self.fishes[0].getId())
         self.initUI()
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.updatePopulation)
@@ -31,13 +31,13 @@ class Dashboard(QMainWindow):
 
     def updatePopulation(self):
         self.updateAllFishes()
-        num = len(self.fished)
+        num = len(self.fishes)
         i = 0
         temp = 0
         j = 0
 
-        newPopulationLabel = "Khor-Pond Population : " + str(len(self.fished)) + "/" + str(
-            len(self.fished)) + " (" + str(int((len(self.fished)/len(self.fished)) * 100)) + "%)"
+        newPopulationLabel = "Khor-Pond Population : " + str(len(self.fishes)) + "/" + str(
+            self.allPondsFishes) + " (" + str(len(self.fishes)/self.allPondsFishes * 100) + "%)"
         self.label.setText(newPopulationLabel)
         # Clear the grid layout before adding the updated fish frames
         for i in reversed(range(self.grid.count())):
@@ -47,8 +47,8 @@ class Dashboard(QMainWindow):
 
         for r in range(0, num):
             while j < 4 and i < num:
-                info = [self.fished[i].getFishData().getId(), self.fished[i].getFishData().getState(),
-                        self.fished[i].getFishData().getStatus(), self.fished[i].getFishData().getGenesis(), str(self.fished[i].getFishData().lifetime)]
+                info = [self.fishes[i].getFishData().getId(), self.fishes[i].getFishData().getState(),
+                        self.fishes[i].getFishData().getStatus(), self.fishes[i].getFishData().getGenesis(), str(self.fishes[i].getFishData().lifetime)]
                 self.grid.addWidget(FishFrame(info, self.widget), temp, j)
                 i += 1
                 j += 1
@@ -89,13 +89,13 @@ class Dashboard(QMainWindow):
         chartView.setFixedSize(1000, 400)
 
         # temp = ["Fish ID: 123", "State: In Pond", "Status: alive", "Genesis: Sick-Salmon", "Crowd Threshold: 5/10", "Pheromone Level: 4/5", "Lifetime: 30/60"]
-        # print(self.fished[0].getFishData().getGenesis())
-        num = len(self.fished)
+        # print(self.fishes[0].getFishData().getGenesis())
+        num = len(self.fishes)
         j = 0
         temp = 0
         i = 0
-        self.label = QLabel("Khor-Pond Population : " + str(len(self.fished)) + "/" + str(self.allPondsNum) +
-                            " (" + str(int((len(self.fished)/self.allPondsNum) * 100)) + "%)", self)
+        self.label = QLabel("Khor-Pond Population : " + str(len(self.fishes)) + "/" + str(
+            self.allPondsFishes) + " (" + str(len(self.fishes)/self.allPondsFishes * 100) + "%)", self)
         font = self.label.font()
         font.setPointSize(20)
         font.setBold(True)
@@ -106,8 +106,8 @@ class Dashboard(QMainWindow):
             # print("out", i, temp, j)
             while j < 4 and i < num:
                 # print("here", i, temp, j)
-                info = [self.fished[i].getFishData().getId(), self.fished[i].getFishData().getState(),
-                        self.fished[i].getFishData().getStatus(), self.fished[i].getFishData().getGenesis(), str(self.fished[i].getFishData().lifetime)]
+                info = [self.fishes[i].getFishData().getId(), self.fishes[i].getFishData().getState(),
+                        self.fishes[i].getFishData().getStatus(), self.fishes[i].getFishData().getGenesis(), str(self.fishes[i].getFishData().lifetime)]
                 self.grid.addWidget(FishFrame(info, self.widget), temp, j)
                 i += 1
                 j += 1
