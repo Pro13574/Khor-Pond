@@ -54,6 +54,7 @@ class Pond:
         self.pondData.addFish(newFish.fishData)
         self.movingSprites.add(newFish)
         self.fishStore.add_fish(newFish.getFishData())
+        print(newFish.getFishData())
         # self.network.pond = self.pondData
 
     def removeFish(self, fish):
@@ -61,13 +62,17 @@ class Pond:
         for f in self.pondData.fishes:
             if f.id == fish.getId():
                 self.pondData.fishes.remove(f)
+                self.fishStore.remove_fish(f.id)
                 break
         self.movingSprites.remove(fish)
+        
         # self.network.pond = self.pondData
 
     def load_fishes(self):
         for fish in self.fishStore.get_fishes().values():
-            self.movingSprites.add(fish)
+            # self.movingSprites.add(fish)
+            # self.fishes.append(fish)
+            self.addFish(fish)
 
     def update(self, injectPheromone=False):
         for index, fish in enumerate(self.fishes):
@@ -127,15 +132,18 @@ class Pond:
         other_pond_list = []
 
         self.load_fishes()
+        print(self.fishes)
         self.addFish(Fish())
         running = True
+        print(self.fishes)
         while running:
-            print("len fishes ", len(self.fishes))
-            if len(self.fishes) > 15:
-                while (len(self.fishes) > 16):
-                    print("looping")
-                    kill = randint(0, len(self.fishes) - 1)
-                    self.removeFish(self.fishes[kill])
+            # print("len fishes ", len(self.fishes))
+            # if len(self.fishes) > 15:
+            #     while (len(self.fishes) > 16):
+            #         # print("looping")
+            #         kill = randint(0, len(self.fishes) - 1)
+            #         print(self.fishes[kill].getFishData())
+            #         self.removeFish(self.fishes[kill])
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -175,10 +183,10 @@ class Pond:
                 self.update()
                 update_time = pygame.time.get_ticks()
 
-            if (time_since_new_birth > 2000):
-                print("phero cloud inject")
-                self.pheromoneCloud()
-                pregnant_time = pygame.time.get_ticks()
+            # if (time_since_new_birth > 2000):
+            #     # print("phero cloud inject")
+            #     self.pheromoneCloud()
+            #     pregnant_time = pygame.time.get_ticks()
 
             pygame.display.flip()
             clock.tick(60)
