@@ -1,125 +1,84 @@
+from PyQt5.QtWidgets import (QWidget, QSlider, QLineEdit, QLabel, QPushButton, QScrollArea, QApplication,
+                             QHBoxLayout, QGroupBox, QGridLayout, QVBoxLayout, QMainWindow, QFrame)
+from PyQt5.QtCore import Qt, QSize
+from PyQt5.QtCore import QTimer
+from PyQt5 import QtWidgets, uic, QtGui
+from PyQt5.QtChart import QChart, QChartView, QPieSeries, QPieSlice
+from PyQt5.QtGui import QPainter, QColor, QFont
 import sys
-import time
-from BarChart import BarChart
 
-from PyQt5.QtGui import * 
-from PyQt5.QtWidgets import *
-from PySide6.QtCharts import QChart, QChartView, QPieSeries
+from FishFrame import FishFrame
+from PondFrame import PondFrame
 
 
-class ViViDashboard(QMainWindow):
-    def __init__(self):
+class ViviDashboard(QMainWindow):
+
+    def __init__(self, connectedPonds, myPond=None):
         super().__init__()
-
-        self.last_update = time.time()
-        
-        # self.pond: PondData = pond
-        self.population = 60
-        self.genesis_name = ["Doo Pond", "Khor Pond", "Matrix Pond"]
-        self.genesis_value = ["20", "30", "10"]
-        self.pheromone = 0
-        self.chart = BarChart()
-
+        self.connectedPonds = connectedPonds
+        self.myPond = myPond
+        self.listedPonds = []
+        # print(self.fishes[0].getId())
         self.initUI()
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.updatePond)
+        self.timer.start(500)
 
-
-    def update(self):
-        self.label_population.setText(str(self.population))  
-        # self.label_pheromone.setText(str(self.pheromone))
-
-        all_genesis = ""
-        for i in range(len(self.genesis_name)):
-            percent = round((int(self.genesis_value[i]) / self.population) * 100, 2)
-            all_genesis += self.genesis_name[i] + "   " + str(percent) + " %\n"
-
-        self.label_genesis.setText(all_genesis)
+    def updatePond(self):
+        for pondFrame in self.widget.findChildren(PondFrame):
+            pondName = pondFrame.name.text().split(": ")[1]
+            if self.myPond.name == pondName:
+                info = [self.myPond.name, len(
+                    self.myPond.fishes), self.myPond.pheromone]
+                pondFrame.updateInfo(info)
+                continue
+            for pond in self.connectedPonds:
+                if pond.name == pondName:
+                    info = [pond.name, pond.total_fishes, pond.pheromone]
+                    pondFrame.updateInfo(info)
+                    break
 
     def initUI(self):
-        self.setWindowTitle('Vivi System Dashboard')
-        
-        self.setGeometry(100, 100, 583, 554)
 
-        self.widget = QWidget()
-        self.widget.setGeometry(10, 20, 583, 554)
+        # Scroll Area which contains the widgets, set as the centralWidget
+        self.scroll = QScrollArea()
+        self.widget = QWidget()         # Widget that contains the collection of Vertical Box
+        # The Vertical Box that contains the Horizontal Boxes of  labels and buttons
+        self.vbox = QVBoxLayout()
 
-        self.verticalLayout = QVBoxLayout()
-        self.horizontalLayout = QHBoxLayout()
-        
-        self.label = QLabel()
-        self.label.setText("Population")
-        self.horizontalLayout.addWidget(self.label)
-        self.label_population = QLabel()
-        self.horizontalLayout.addWidget(self.label_population)
-        self.verticalLayout.addLayout(self.horizontalLayout)
+        label = QLabel("Vividashboard", self)
+        font = label.font()
+        font.setPointSize(20)
+        font.setBold(True)
+        label.setFont(font)
+        label.setStyleSheet("padding-left: 20px; color: white;")
+        self.vbox.addWidget(label)
 
-        self.label_genesis = QLabel()
-        self.verticalLayout.addWidget(self.label_genesis)
+        if self.myPond:
+            info = [self.myPond.name, len(
+                self.myPond.fishes), self.myPond.pheromone]
+            self.listedPonds.append(self.myPond.name)
+            self.vbox.addWidget(PondFrame(info, self.widget))
 
-        self.verticalLayout.addWidget(self.chart)
+        for pond in self.connectedPonds:
+            info = [pond.name, pond.total_fishes, pond.pheromone]
+            self.listedPonds.append(pond.name)
+            self.vbox.addWidget(PondFrame(info, self.widget))
 
-        # self.verticalLayout.setStretch(1, 1)
-        # self.verticalLayout.setStretch(2, 1)
-        self.verticalLayout.setStretch(1, 0)
-        self.verticalLayout.setStretch(0, 0)
-        
+        self.updatePond()
 
-#         self.verticalLayout_2 = QVBoxLayout()
-#         self.horizontalLayout_2 = QHBoxLayout()
+        self.widget.setLayout(self.vbox)
 
-#         self.label_3 = QLabel()
-#         self.label_3.setText("Pheromone")
-#         self.horizontalLayout_2.addWidget(self.label_3)
-#         self.label_pheromone = QLabel()
-#         self.horizontalLayout_2.addWidget(self.label_pheromone)
-#         self.verticalLayout_2.addLayout(self.horizontalLayout_2)
+        # Scroll Area Properties
+        self.scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.scroll.setWidgetResizable(True)
+        self.scroll.setWidget(self.widget)
 
-#         self.label_6 = QLabel()
-#         self.label_6.setText("Constants\n"
-# "     Population       100000\n"
-# "     Display Limit   300\n"
-# "     Birth Rate        1x")
-#         self.verticalLayout_2.addWidget(self.label_6)
+        self.setCentralWidget(self.scroll)
+        self.setStyleSheet("background-color: #2A9A5D;")
+        self.setGeometry(0, 290, 400, 300)
+        self.setWindowTitle('ViviDashboard')
+        self.show()
 
-#         self.graphicsView_2 = PlotWidget()
-#         self.graphicsView_2.setObjectName("graphicsView_2")
-#         self.verticalLayout_2.addWidget(self.graphicsView_2)
-
-#         self.verticalLayout_2.setStretch(1, 1)
-#         self.verticalLayout_2.setStretch(2, 5)
-
-        self.layout = QHBoxLayout()
-        self.layout.addLayout(self.verticalLayout)
-        # self.layout.addLayout(self.verticalLayout_2)
-        self.widget.setLayout(self.layout)
-        self.setCentralWidget(self.widget)
-        
-        self.show()   
-
-        # return
-    
-    # def draw(self):
-    #      # Create a pie series and add slices
-    #     series = QPieSeries()
-    #     series.append("Apple", 20)
-    #     series.append("Orange", 30)
-    #     series.append("Banana", 10)
-    #     series.append("Grapes", 25)
-    #     series.append("Pineapple", 15)
-
-    #     # Create a chart and set the series
-    #     chart = QChart()
-    #     chart.addSeries(series)
-    #     chart.setTitle("Pond")
-
-    #     # Create a chart view and set the chart
-    #     chart_view = QChartView(chart)
-
-    #     # Set the central widget of the main window to the chart view
-    #     self.setCentralWidget(chart_view)
-    #     self.show()
-
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    window = ViViDashboard()
-    window.update()
-    sys.exit(app.exec())
+        return
