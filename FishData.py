@@ -67,5 +67,4 @@ class FishData:
         if self.parentId:
             return str(self.id) + "Genesis:" + str(self.genesis) + " Parent:" + str(self.parentId) + " Lifetime: " + str(self.lifetime) + " Birthtime: " + str(self.birthtime) + "c " + str(self.crowdTs) + "p " + str(self.pheromoneTs)
         else:
-            # return self.id + "Genesis:" + self.genesis + " Lifetime: " + str(self.lifetime) + " Birthtime: " + str(self.birthtime)
-            return
+            return self.id + "Genesis:" + self.genesis + " Lifetime: " + str(self.lifetime) + " Birthtime: " + str(self.birthtime)
