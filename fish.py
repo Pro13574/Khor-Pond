@@ -7,13 +7,26 @@ import pygame
 
 from FishData import FishData
 
+from vivisystem.client import VivisystemClient
+from vivisystem.models import EventType, VivisystemFish, VivisystemPond
+
 SPRITEPATH = "./assets/images/sprites/"
+
+
+def randId():
+    digits = [i for i in range(0, 10)]
+    random_str = ""
+    for i in range(6):
+        index = math.floor(random.random() * 10)
+        random_str += str(digits[index])
+    return random_str
 
 
 class Fish(pygame.sprite.Sprite):
     def __init__(self, genesis="khor-pond", parent=None, data: FishData = None):
         super().__init__()
-        self.fishData = data or FishData(genesis, parent)
+        self.fishData = data or FishData(
+            genesis, id=randId(), parentId=parent)
         self.direction = random.choice(["left", "right"])
         self.frame = 0
         self.sprites: dict[str, list[pygame.Surface]] = {
@@ -40,6 +53,13 @@ class Fish(pygame.sprite.Sprite):
 
         self.rect.x = random.randint(0, 1280 - self.rect.width)
         self.rect.y = random.randint(0, 720 - self.rect.height)
+
+    @classmethod
+    def from_vivisystemFish(cls, fish: VivisystemFish):
+        return cls(data=FishData(genesis=fish.genesis, id=fish.fish_id, parentId=fish.parent_id, lifetime=fish.lifetime, pheromoneTs=fish.pheromone_threshold, crowdTs=fish.crowd_threshold))
+
+    def to_vivisystemFish(self):
+        return VivisystemFish(self.getId(), self.getParentId(), self.getGenesis(), self.getCrowdThresh(), self.getPheromoneThresh(), self.getLifetime())
 
     def getFishData(self):
         return self.fishData
@@ -170,9 +190,6 @@ class Fish(pygame.sprite.Sprite):
     def crowding(self):
         pass
 
-    def getId(self):
-        return self.fishData.getId()
-
     def getInfo(self):
         return "Fish:" + self.fishData.getId() + "\n" + "Genesis name: " + self.genesis + "\nStatus: " + self.fishData.status
 
@@ -197,8 +214,20 @@ class Fish(pygame.sprite.Sprite):
     def getGenesis(self):
         return self.fishData.getGenesis()
 
+    def getId(self):
+        return self.fishData.getId()
+
+    def getParentId(self):
+        return self.fishData.getParentId()
+
+    def getLifetime(self):
+        return self.fishData.getLifetime()
+
+    def getPheromoneThresh(self):
+        return self.fishData.getPheromoneThresh()
+
     def getCrowdThresh(self):
-        return self.fishData.getCrowdThreshold()
+        return self.fishData.getCrowdThresh()
 
     def giveBirth(self):
         self.gaveBirth = True

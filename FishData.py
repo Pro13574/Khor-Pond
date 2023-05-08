@@ -3,15 +3,6 @@ import math
 from datetime import datetime
 
 
-def randId():
-    digits = [i for i in range(0, 10)]
-    random_str = ""
-    for i in range(6):
-        index = math.floor(random.random() * 10)
-        random_str += str(digits[index])
-    return random_str
-
-
 def randCrowdTs():
     return random.randint(5, 20)
 
@@ -21,17 +12,20 @@ def randPheroTs():
 
 
 class FishData:
-    def __init__(self, genesis, parentId=None):
-        self.id = randId()
+    def __init__(self, genesis: str, id: str, parentId: str = None, lifetime: int = None, pheromoneTs: int = None, crowdTs: int = None):
+        self.id = id
         self.state = "in-pond"
         self.status = "alive"
         self.genesis = genesis
-        self.crowdTs = randCrowdTs()
+        self.crowdTs = crowdTs or randCrowdTs()
         self.pheromone = 0
-        self.pheromoneTs = randPheroTs()
-        self.lifetime = 0
+        self.pheromoneTs = pheromoneTs or randPheroTs()
+        self.lifetime = lifetime or 60
         self.staytime = 15
         self.parentId = parentId
+
+        # print(self)
+        # print("add-on", self.crowdTs, self.pheromoneTs)
 
         birth = datetime.now()
         self.birthtime = datetime.timestamp(birth)
@@ -48,7 +42,7 @@ class FishData:
     def getGenesis(self):
         return self.genesis
 
-    def getCrowdThreshold(self):
+    def getCrowdThresh(self):
         return self.crowdTs
 
     def getPheromone(self):
@@ -71,6 +65,7 @@ class FishData:
 
     def __str__(self):
         if self.parentId:
-            return self.id + "Genesis:" + self.genesis + " Parent:" + self.parentId + " Lifetime: " + str(self.lifetime) + " Birthtime: " + str(self.birthtime)
+            return str(self.id) + "Genesis:" + str(self.genesis) + " Parent:" + str(self.parentId) + " Lifetime: " + str(self.lifetime) + " Birthtime: " + str(self.birthtime) + "c " + str(self.crowdTs) + "p " + str(self.pheromoneTs)
         else:
-            return self.id + "Genesis:" + self.genesis + " Lifetime: " + str(self.lifetime) + " Birthtime: " + str(self.birthtime)
+            # return self.id + "Genesis:" + self.genesis + " Lifetime: " + str(self.lifetime) + " Birthtime: " + str(self.birthtime)
+            return
