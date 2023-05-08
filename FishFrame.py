@@ -10,6 +10,7 @@ class FishFrame(QGroupBox):
         self.vbox = QVBoxLayout()
         self.hbox = QHBoxLayout()
         self.vbox.addLayout(self.hbox)
+        self.info = []
         self.setLayout(self.vbox)
         self.addInfo(info)
 
@@ -30,12 +31,15 @@ class FishFrame(QGroupBox):
         pixmap = pixmap.scaled(low_rez)
         label.setPixmap(pixmap)
         self.addLabel(label)
+        self.info.append(QLabel("ID: " + str(info[0])))
+        self.info.append(QLabel("State: " + str(info[1])))
+        self.info.append(QLabel("Status: " + str(info[2])))
+        self.info.append(QLabel("Genesis: " + str(info[3])))
+        self.info.append(QLabel("Lifetime: " + str(info[4])))
 
-        self.addLabel(QLabel("ID: " + str(info[0])))
-        self.addLabel(QLabel("State: " + str(info[1])))
-        self.addLabel(QLabel("Status: " + str(info[2])))
-        self.addLabel(QLabel("Genesis: " + str(info[3])))
-        self.addLabel(QLabel("Lifetime: " + str(info[4])))
+        for label in self.info:
+            label.setStyleSheet("color: white; font-weight: 700;")
+            self.addLabel(label)
 
     def addLabel(self, widget):
         self.vbox.addWidget(widget)
