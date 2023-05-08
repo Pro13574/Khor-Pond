@@ -6,7 +6,6 @@ from Fish import Fish
 from FishStore import FishStore
 import random
 from random import randint
-from Client import Client
 
 import sys
 import pygame
@@ -17,6 +16,10 @@ from PyQt5 import QtWidgets, uic, QtGui
 
 from vivisystem.client import VivisystemClient
 from vivisystem.models import EventType, VivisystemFish, VivisystemPond
+
+UPDATE_EVENT = pygame.USEREVENT + 1
+PHEROMONE_EVENT = pygame.USEREVENT + 2
+NOTICE_DATABASE_EVENT = pygame.USEREVENT + 3
 
 
 class Pond:
@@ -29,10 +32,6 @@ class Pond:
         self.pondData = PondData(self.name)
         self.msg = ""
         self.client = client
-
-        self.UPDATE_EVENT = pygame.USEREVENT + 1
-        self.PHEROMONE_EVENT = pygame.USEREVENT + 2
-        self.NOTICE_DATABASE_EVENT = pygame.USEREVENT + 3
 
     def getPondData(self):
         return self.pondData
@@ -52,6 +51,11 @@ class Pond:
         if pond_name in self.connectedPonds:
             del self.connectedPonds[pond_name]  # let's see if it works
             print(f"{pond_name} disconnected")
+
+    def terminate(self):
+        if self.client:
+            self.client.disconnect()
+        sys.exit()
 
     def pheromoneCloud(self):
         pheromone = randint(2, 20)
@@ -102,35 +106,29 @@ class Pond:
                 continue
             self.pondData.setFish(fish.fishData)
 
-            if len(self.network.other_ponds.keys()) > 0:
+            if self.connectedPonds:
                 if fish.getGenesis() != self.name and fish.survivalTime >= 5 and not fish.gaveBirth:
                     newFish = Fish(fish.fishData.genesis, fish.fishData.id)
 
-                if fish.getGenesjs() == self.name and fish.survivalTime <= 15:
-                    if random.getrandbits(1):
-                        destination = random.choice(
-                            list(self.network.other_pondsd.keys()))
-                        self.migrateFish(index, destination)
-                        parent = None
-                        if (fish.fishData.parentId):
-                            parent = fish.fishData.parentId
-                        for index2, fish2 in enumerate(self.fishes):
-                            if parent and fish2.fishData.parentId == parent or fish2.fishData.parentId == fish.getId():
-                                self.migrate(index2, destination)
-                                break
-                        continue
+                if fish.getGenesis() == self.name and fish.survivalTime <= 15:
+                    pass
+                elif fish.getGenesis() == self.name and fish.survivalTime >= 15:
+                    destination = random.choice(list(self.connectedPonds))
+                    self.client.migrate_fish(
+                        destination, fish.toVivisystemFish())
+                    self.removeFish(fish)
                 else:
-                    destination = random.choice(
-                        list(self.network.other_ponds.key()))
                     if self.getPopulation() > fish.getCrowdThresh():
-                        self.migrateFish(index, destination)
-                        continue
+                        destination = random.choice(list(self.connectedPonds))
+                        self.client.migrate_fish(
+                            destination, fish.toVivisystemFish())
+                        self.removeFish(fish)
             if (injectPheromone):
                 self.pheromoneCloud()
-            self.network.pond = self.pondData
+            # self.network.pond = self.pondData
 
     def run(self):
-        self.network = Client(self.pondData)
+        # self.network = Client(self.pondData)
         # msg_handler = threading.Thread(target=self.network.get_msg)
         # msg_han6dler.start()
         # send_handler = threading.Thread(target=self.network.send_pond)
@@ -153,6 +151,10 @@ class Pond:
         self.load_fishes()
         self.addFish(Fish(parent=None))
 
+        pygame.time.set_timer(UPDATE_EVENT, 1000)
+        pygame.time.set_timer(NOTICE_DATABASE_EVENT, 1000)
+        pygame.time.set_timer(PHEROMONE_EVENT, 2000)
+
         if self.client:
             handler_map = {
                 EventType.MIGRATE: self.handle_migrate,
@@ -160,7 +162,7 @@ class Pond:
                 EventType.DISCONNECT: self.handle_disconnect
             }
             for event_type, handler in handler_map.items():
-                self.__client.handle_event(event_type, handler)
+                self.client.handle_event(event_type, handler)
 
         running = True
         while running:
@@ -173,15 +175,27 @@ class Pond:
                     self.removeFish(self.fishes[kill])
 
             for event in pygame.event.get():
+                if event.type == UPDATE_EVENT:
+                    self.update()
+                if event.type == PHEROMONE_EVENT:
+                    self.pheromoneCloud()
+                if event.type == NOTICE_DATABASE_EVENT:
+                    self.client.send_status(VivisystemPond(
+                        self.name,
+                        len(self.fishes),
+                        1))
                 if event.type == pygame.QUIT:
                     running = False
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_RIGHT:
+                        # TODO----------------------------------------EDIT PLEASE--------------------------------------
                         # print(self.fishes[0].getId())
                         allPondsNum = len(self.fishes)
-                        for p in self.network.other_ponds.values():
-                            allPondsNum += p.getPopulation()
-                        db = Dashboard(self, allPondsNum)
+                        for p in self.connectedPonds:
+                            allPondsNum += p.total_fishes
+                        dashboard = Dashboard(self, allPondsNum)
+                    if event.key == pygame.K_LEFT:
+                        viviDashboard = ViviDashboard(self.connectedPonds)
             # pond_handler = threading.Thread(target=app.exec_)
             # pond_handler.start()
             self.movingSprites.update()
@@ -207,19 +221,19 @@ class Pond:
             time_since_update = pygame.time.get_ticks() - update_time
 
             if time_since_update > 1000:
-                self.update()
+
                 update_time = pygame.time.get_ticks()
 
             if (time_since_new_birth > 2000):
                 # print("phero cloud inject")
-                self.pheromoneCloud()
+
                 pregnant_time = pygame.time.get_ticks()
 
             pygame.display.flip()
             clock.tick(60)
 
         pygame.quit()
-
+        self.terminate()
 
 # if __name__ == "__main__":
 #     p = Pond()
