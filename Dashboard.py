@@ -12,7 +12,7 @@ from FishFrame import FishFrame
 
 class Dashboard(QMainWindow):
 
-    def __init__(self, myPond=None, allPondsNum=None):
+    def __init__(self, myPond: str = None, allPondsNum: int = None):
         super().__init__()
         self.myPond = myPond
         self.fished = myPond.fishes
@@ -26,8 +26,8 @@ class Dashboard(QMainWindow):
 
     def updateAllFishes(self):
         self.allPondsFishes = len(self.myPond.fishes)
-        for pond in self.myPond.network.other_ponds.values():
-            self.allPondsFishes += pond.getPopulation()
+        for pond in self.myPond.connectedPonds:
+            self.allPondsFishes += pond.total_fishes
 
     def updatePopulation(self):
         self.updateAllFishes()
@@ -71,9 +71,9 @@ class Dashboard(QMainWindow):
         slice = QPieSlice(self.myPond.name +
                           str(fishPercentage) + "%", fishPercentage)
         self.series.append(slice)
-        for pond in self.myPond.network.other_ponds.keys():
+        for pond in self.myPond.connectedPonds:
             fishPercentage = len(
-                self.myPond.network.other_ponds[pond].fishes)/self.allPondsFishes * 100
+                self.myPond.fishes)/self.allPondsFishes * 100
             slice = QPieSlice(
                 pond + str(fishPercentage) + "%", fishPercentage)
             self.series.append(slice)
