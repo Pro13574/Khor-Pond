@@ -1,5 +1,6 @@
 import random
 import math
+from datetime import datetime
 
 
 def randId():
@@ -28,9 +29,12 @@ class FishData:
         self.crowdTs = randCrowdTs()
         self.pheromone = 0
         self.pheromoneTs = randPheroTs()
-        self.lifetime = 60
+        self.lifetime = 0
         self.staytime = 15
         self.parentId = parentId
+
+        birth = datetime.now()
+        self.birthtime = datetime.timestamp(birth)
 
     def getId(self):
         return self.id
@@ -67,6 +71,6 @@ class FishData:
 
     def __str__(self):
         if self.parentId:
-            return self.id + "Genesis:" + self.genesis + " Parent:" + self.parentId + " Lifetime: " + str(self.lifetime)
+            return self.id + "Genesis:" + self.genesis + " Parent:" + self.parentId + " Lifetime: " + str(self.lifetime) + " Birthtime: " + str(self.birthtime)
         else:
-            return self.id + "Genesis:" + self.genesis + " Lifetime: " + str(self.lifetime)
+            return self.id + "Genesis:" + self.genesis + " Lifetime: " + str(self.lifetime) + " Birthtime: " + str(self.birthtime)

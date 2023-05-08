@@ -53,10 +53,14 @@ class FishStore:
         self.redis: redis.StrictRedis = redis
 
     def add_fish(self, fish: FishData):
-        self.redis.set(fish.getId(), pickle.dumps(fish), ex=fish.getLifetime())
+        self.redis.set(fish.getId(), pickle.dumps(fish))
+        # , ex=fish.getLifetime()
 
-    def remove_fish(self, fish_ids: List[str]):
-        self.redis.delete(*fish_ids)
+    # def remove_fish(self, fish_ids: List[str]):
+    #     self.redis.delete(*fish_ids)
+
+    def remove_fish(self, fish_id: str):
+        self.redis.delete(fish_id)
 
     # TODO: need to compare performance later
     def remove_batch(self, fish_ids: List[str]):

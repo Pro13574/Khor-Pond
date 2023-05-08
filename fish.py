@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 import math
 import random
 import time
@@ -181,9 +181,15 @@ class Fish(pygame.sprite.Sprite):
 
     def updateLifeTime(self):
         # self.in_pond_sec += 1
-        self.fishData.lifetime -= 1
-        if self.fishData.lifetime == 0:
+        now = datetime.now()
+        time = datetime.timestamp(now)
+        self.fishData.lifetime = 60 - int(time - self.fishData.birthtime)
+        if self.fishData.lifetime <= 0:
+            print(self.fishData.getId() + "dead")
             self.fishData.status = "dead"
+        # if (time - self.fishData.birthtime) > 10:
+        #     print(str(self.fishData.getId) + "dead")
+        #     self.fishData.status = "dead"
 
     def resetPheromone(self):
         self.fishData.pheromone = 0
