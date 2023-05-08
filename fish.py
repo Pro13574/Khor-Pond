@@ -118,7 +118,7 @@ class Fish(pygame.sprite.Sprite):
         else:
             path += "foreign-pond/"
 
-        for i in range(1, 5):
+        for i in range(1, 7):
             image_path = f"{path}/{i}.png"
             image = pygame.image.load(image_path).convert_alpha()
             image_left = pygame.transform.scale(image, (100, 100))
