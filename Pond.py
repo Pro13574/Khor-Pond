@@ -141,7 +141,7 @@ class Pond:
         pygame.init()
         screen = pygame.display.set_mode((1280, 720))
 
-        bg = pygame.image.load("./assets/images/background/bg.jpg")
+        bg = pygame.image.load("./assets/images/background/bg.jpeg")
         bg = pygame.transform.scale(bg, (1280, 720))
         pygame.display.set_caption("Fish Haven Project")
 
