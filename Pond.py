@@ -1,5 +1,6 @@
 import threading
 from Dashboard import Dashboard
+from FishData import FishData
 from PondData import PondData
 from Fish import Fish
 from FishStore import FishStore
@@ -14,22 +15,43 @@ from PyQt5.QtWidgets import (QWidget, QSlider, QLineEdit, QLabel, QPushButton, Q
 from PyQt5.QtCore import Qt, QSize
 from PyQt5 import QtWidgets, uic, QtGui
 
+from vivisystem.client import VivisystemClient
+from vivisystem.models import EventType, VivisystemFish, VivisystemPond
+
 
 class Pond:
-    def __init__(self, name: str, fishStore: FishStore):
+    def __init__(self, name: str, fishStore: FishStore, client: VivisystemClient = None):
         self.name: str = name
         self.fishStore: FishStore = fishStore
         self.fishes = []
+        self.connectedPonds = {}
         self.movingSprites = pygame.sprite.Group()
         self.pondData = PondData(self.name)
         self.msg = ""
-        self.network = None
+        self.client = client
+
+        self.UPDATE_EVENT = pygame.USEREVENT + 1
+        self.PHEROMONE_EVENT = pygame.USEREVENT + 2
+        self.NOTICE_DATABASE_EVENT = pygame.USEREVENT + 3
 
     def getPondData(self):
         return self.pondData
 
     def getPopulation(self):
         return len(self.fishes)
+
+    def handle_migrate(self, vivi_fish: VivisystemFish):
+        fish = Fish.from_vivisystemFish(vivi_fish)
+        self.add_fish(fish)
+        print(f"Migrated fish {fish.get_id()} from {vivi_fish.genesis}")
+
+    def handle_status(self, vivi_pond: VivisystemPond):
+        self.connectedPonds[vivi_pond.name] = vivi_pond
+
+    def handle_disconnect(self, pond_name: str):
+        if pond_name in self.connectedPonds:
+            del self.connectedPonds[pond_name]  # let's see if it works
+            print(f"{pond_name} disconnected")
 
     def pheromoneCloud(self):
         pheromone = randint(2, 20)
@@ -54,7 +76,7 @@ class Pond:
         self.pondData.addFish(newFish.fishData)
         self.movingSprites.add(newFish)
         self.fishStore.add_fish(newFish.getFishData())
-        print(newFish.getFishData())
+        # print(newFish.getFishData())
         # self.network.pond = self.pondData
 
     def removeFish(self, fish):
@@ -65,13 +87,11 @@ class Pond:
                 self.fishStore.remove_fish(f.id)
                 break
         self.movingSprites.remove(fish)
-        
+
         # self.network.pond = self.pondData
 
     def load_fishes(self):
         for fish in self.fishStore.get_fishes().values():
-            # self.movingSprites.add(fish)
-            # self.fishes.append(fish)
             self.addFish(fish)
 
     def update(self, injectPheromone=False):
@@ -130,20 +150,27 @@ class Pond:
         pregnant_time = pygame.time.get_ticks()
         update_time = pygame.time.get_ticks()
         other_pond_list = []
-
         self.load_fishes()
-        print(self.fishes)
-        self.addFish(Fish())
+        self.addFish(Fish(parent=None))
+
+        if self.client:
+            handler_map = {
+                EventType.MIGRATE: self.handle_migrate,
+                EventType.STATUS: self.handle_status,
+                EventType.DISCONNECT: self.handle_disconnect
+            }
+            for event_type, handler in handler_map.items():
+                self.__client.handle_event(event_type, handler)
+
         running = True
-        print(self.fishes)
         while running:
-            # print("len fishes ", len(self.fishes))
-            # if len(self.fishes) > 15:
-            #     while (len(self.fishes) > 16):
-            #         # print("looping")
-            #         kill = randint(0, len(self.fishes) - 1)
-            #         print(self.fishes[kill].getFishData())
-            #         self.removeFish(self.fishes[kill])
+            print("len fishes ", len(self.fishes))
+            if len(self.fishes) > 15:
+                while (len(self.fishes) > 16):
+                    # print("looping")
+                    kill = randint(0, len(self.fishes) - 1)
+                    print(self.fishes[kill].getFishData())
+                    self.removeFish(self.fishes[kill])
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -183,10 +210,10 @@ class Pond:
                 self.update()
                 update_time = pygame.time.get_ticks()
 
-            # if (time_since_new_birth > 2000):
-            #     # print("phero cloud inject")
-            #     self.pheromoneCloud()
-            #     pregnant_time = pygame.time.get_ticks()
+            if (time_since_new_birth > 2000):
+                # print("phero cloud inject")
+                self.pheromoneCloud()
+                pregnant_time = pygame.time.get_ticks()
 
             pygame.display.flip()
             clock.tick(60)
