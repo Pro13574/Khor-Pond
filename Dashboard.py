@@ -12,11 +12,10 @@ from FishFrame import FishFrame
 
 class Dashboard(QMainWindow):
 
-    def __init__(self, myPond: str = None, allPondsNum: int = None):
+    def __init__(self, myPond: str = None):
         super().__init__()
         self.myPond = myPond
         self.fishes = myPond.fishes
-        self.allPondsNum = allPondsNum
         self.allPondsFishes = 0
         # print(self.fishes[0].getId())
         self.initUI()
@@ -25,7 +24,8 @@ class Dashboard(QMainWindow):
         self.timer.start(500)
 
     def updateAllFishes(self):
-        self.allPondsFishes = len(self.myPond.fishes)
+        self.allPondsFishes = 0
+        self.allPondsFishes += len(self.myPond.fishes)
         for pond in self.myPond.connectedPonds:
             self.allPondsFishes += pond.total_fishes
 
