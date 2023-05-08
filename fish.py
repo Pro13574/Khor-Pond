@@ -11,9 +11,9 @@ SPRITEPATH = "./assets/images/sprites/"
 
 
 class Fish(pygame.sprite.Sprite):
-    def __init__(self, genesis="khor-pond", parent=None):
+    def __init__(self, genesis="khor-pond", parent=None, data: FishData = None):
         super().__init__()
-        self.fishData = FishData(genesis, parent)
+        self.fishData = data or FishData(genesis, parent)
         self.direction = random.choice(["left", "right"])
         self.frame = 0
         self.sprites: dict[str, list[pygame.Surface]] = {

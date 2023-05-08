@@ -69,5 +69,5 @@ class FishStore:
         fishes_data = [
             pickle.loads(data) for data in self.redis.mget(fish_ids) if data is not None
         ]
-        fishes = [Fish(fish) for fish in fishes_data]
+        fishes = [Fish(data=fish) for fish in fishes_data]
         return dict(zip(fish_ids, fishes))
