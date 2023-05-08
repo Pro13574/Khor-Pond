@@ -13,6 +13,7 @@ from PyQt5.QtWidgets import (QWidget, QSlider, QLineEdit, QLabel, QPushButton, Q
                              QHBoxLayout, QVBoxLayout, QMainWindow)
 from PyQt5.QtCore import Qt, QSize
 from PyQt5 import QtWidgets, uic, QtGui
+from ViViDashboard import ViviDashboard
 
 from vivisystem.client import VivisystemClient
 from vivisystem.models import EventType, VivisystemFish, VivisystemPond
@@ -31,6 +32,7 @@ class Pond:
         self.movingSprites = pygame.sprite.Group()
         self.pondData = PondData(self.name)
         self.msg = ""
+        self.pheromone = 1
         self.client = client
 
     def getPondData(self):
@@ -183,19 +185,15 @@ class Pond:
                     self.client.send_status(VivisystemPond(
                         self.name,
                         len(self.fishes),
-                        1))
+                        self.pheromone))
                 if event.type == pygame.QUIT:
                     running = False
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_RIGHT:
-                        # TODO----------------------------------------EDIT PLEASE--------------------------------------
-                        # print(self.fishes[0].getId())
-                        allPondsNum = len(self.fishes)
-                        for p in self.connectedPonds:
-                            allPondsNum += p.total_fishes
-                        dashboard = Dashboard(self, allPondsNum)
+                        dashboard = Dashboard(self)
                     if event.key == pygame.K_LEFT:
-                        viviDashboard = ViviDashboard(self.connectedPonds)
+                        viviDashboard = ViviDashboard(
+                            self.connectedPonds, self)
             # pond_handler = threading.Thread(target=app.exec_)
             # pond_handler.start()
             self.movingSprites.update()
