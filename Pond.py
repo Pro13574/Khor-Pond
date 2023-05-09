@@ -1,4 +1,5 @@
 import threading
+from time import sleep
 from Dashboard import Dashboard
 from FishData import FishData
 from PondData import PondData
@@ -21,6 +22,7 @@ from vivisystem.models import EventType, VivisystemFish, VivisystemPond
 UPDATE_EVENT = pygame.USEREVENT + 1
 PHEROMONE_EVENT = pygame.USEREVENT + 2
 NOTICE_DATABASE_EVENT = pygame.USEREVENT + 3
+BLACKHOLE_EVENT= pygame.USEREVENT + 4
 
 
 class Pond:
@@ -129,6 +131,22 @@ class Pond:
                 self.pheromoneCloud()
             # self.network.pond = self.pondData
 
+    def createBlackhole(self):
+        blackhole = pygame.image.load("./assets/images/sprites/blackhole.png")
+        blackhole = pygame.transform.scale(blackhole, (647, 386))
+        screen = pygame.display.get_surface()
+
+        if len(self.fishes) > 13:
+            # draw the blackhole on the screen
+            screen.blit(blackhole, (270, 290))
+            pygame.display.update()
+            sleep(0.3)
+            selected_fish = random.sample(self.fishes, 10)
+            print("blackhole created")
+            for fish in selected_fish:
+                self.removeFish(fish)
+
+
     def run(self):
         # self.network = Client(self.pondData)
         # msg_handler = threading.Thread(target=self.network.get_msg)
@@ -156,6 +174,7 @@ class Pond:
         pygame.time.set_timer(UPDATE_EVENT, 1000)
         pygame.time.set_timer(NOTICE_DATABASE_EVENT, 1000)
         pygame.time.set_timer(PHEROMONE_EVENT, 2000)
+        pygame.time.set_timer(BLACKHOLE_EVENT, 5000)
 
         if self.client:
             handler_map = {
@@ -168,7 +187,7 @@ class Pond:
 
         running = True
         while running:
-            print("len fishes ", len(self.fishes))
+            # print("len fishes ", len(self.fishes))
             if len(self.fishes) > 15:
                 while (len(self.fishes) > 16):
                     # print("looping")
@@ -186,6 +205,8 @@ class Pond:
                         self.name,
                         len(self.fishes),
                         self.pheromone))
+                if event.type == BLACKHOLE_EVENT:
+                    self.createBlackhole()
                 if event.type == pygame.QUIT:
                     running = False
                 if event.type == pygame.KEYDOWN:
